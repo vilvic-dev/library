@@ -1,0 +1,19 @@
+server:
+  port: 8080
+
+spring:
+  config:
+    name: Library rest service
+  datasource:
+    url: jdbc:h2:mem:library:MODE=MySQL
+    driverClassName: org.h2.Driver
+    username: sa
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      naming:
+        physical-strategy: com.vdev.library.rest.jpa.hibernate.PhysicalNamingStrategyImpl
+    defer-datasource-initialization: true
+  sql:
+    init:
+      data-locations: classpath:db/schema.sql,classpath:db/data.sql
