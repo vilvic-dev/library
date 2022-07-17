@@ -25,7 +25,7 @@ public class BookController {
 
     private final BookService bookService;
 
-    @Operation(summary = "Get a book by id", description = "Get a book by id", tags = {"book"})
+    @Operation(summary = "Get a book by id", description = "Get a book by id", tags = {"Book"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Book found", content = {
                     @Content(

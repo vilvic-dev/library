@@ -1,6 +1,5 @@
 package com.vdev.library.rest.jpa.repository;
 
-import com.vdev.library.rest.controller.model.Book;
 import com.vdev.library.rest.jpa.model.BookEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

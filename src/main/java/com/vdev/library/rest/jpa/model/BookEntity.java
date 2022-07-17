@@ -33,7 +33,7 @@ public class BookEntity {
     @Column(length = 1000)
     private String description;
 
-    @Column(length = 13)
+    @Column(nullable = false, length = 13)
     private String isbn;
 
     @OneToOne(fetch = FetchType.LAZY)

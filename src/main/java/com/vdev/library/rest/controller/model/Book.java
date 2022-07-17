@@ -8,13 +8,13 @@ import lombok.Data;
 @Data
 public class Book {
 
-    @Schema(description = "Book title", example = "The institute")
+    @Schema(description = "Book title", example = "The institute", required = true)
     private String title;
 
     @Schema(description = "Description of book", example = "NO ONE HAS EVER ESCAPED FROM THE INSTITUTE.")
     private String description;
 
-    @Schema(description = "ISBN number", example = "9781529355390")
+    @Schema(description = "ISBN number", example = "9781529355390", required = true)
     private String isbn;
 
     @Schema(description = "Author", example = "Stephen King")
