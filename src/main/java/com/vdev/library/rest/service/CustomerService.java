@@ -1,9 +1,11 @@
 package com.vdev.library.rest.service;
 
 import com.vdev.library.rest.controller.model.Customer;
+import com.vdev.library.rest.exception.NotFoundException;
 import com.vdev.library.rest.jpa.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,15 +47,32 @@ public class CustomerService {
                 .id(customerEntity.getId())
                 .name(customerEntity.getName())
                 .address1(customerEntity.getAddress1())
-                .address2(customerEntity.getAddress2())
-                .address3(customerEntity.getAddress3())
-                .address4(customerEntity.getAddress4())
-                .postCode(customerEntity.getPostCode())
-                .telephone(customerEntity.getTelephone())
-                .email(customerEntity.getEmail())
-                .build())
+                        .address2(customerEntity.getAddress2())
+                        .address3(customerEntity.getAddress3())
+                        .address4(customerEntity.getAddress4())
+                        .postCode(customerEntity.getPostCode())
+                        .telephone(customerEntity.getTelephone())
+                        .email(customerEntity.getEmail())
+                        .build())
                 .collect(Collectors.toList());
     }
 
+    public boolean doesEmailExistForAnotherCustomer(final String id, final String email) {
+        return customerRepository.countByIdNotAndEmail(id, email) > 0;
+    }
+
+    @Transactional
+    public void saveEdit(final String id, final Customer customer) {
+        final var customerEntity = customerRepository.getCustomerEntityById(id).orElseThrow(NotFoundException::new);
+        customerEntity.setName(customer.getName());
+        customerEntity.setAddress1(customer.getAddress1());
+        customerEntity.setAddress2(customer.getAddress2());
+        customerEntity.setAddress3(customer.getAddress3());
+        customerEntity.setAddress4(customer.getAddress4());
+        customerEntity.setPostCode(customer.getPostCode());
+        customerEntity.setTelephone(customer.getTelephone());
+        customerEntity.setEmail(customer.getEmail());
+        customerRepository.save(customerEntity);
+    }
 
 }

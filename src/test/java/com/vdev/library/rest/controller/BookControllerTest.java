@@ -11,10 +11,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import static com.vdev.library.rest.TestConstants.ID_INVALID;
 import static com.vdev.library.rest.TestConstants.STEPHEN_KING_THE_INSTITUTE_ID;
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
-import static org.hamcrest.Matchers.equalTo;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -39,7 +39,6 @@ class BookControllerTest {
                 .response();
 
         response.then()
-                .body("responseStatus", equalTo("OK"))
                 .body("payload", notNullValue())
                 .body("payload.title", equalTo("The Institute"))
                 .body("payload.description", equalTo("NO ONE HAS EVER ESCAPED FROM THE INSTITUTE."))

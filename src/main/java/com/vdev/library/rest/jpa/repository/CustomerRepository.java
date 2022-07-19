@@ -14,4 +14,9 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, String
     @Query("SELECT c FROM CustomerEntity c WHERE c.name like %?1%")
     List<CustomerEntity> findCustomerEntityByName(String name);
 
+    long countByEmail(final String email);
+
+    long countByIdNotAndEmail(final String id, final String email);
+
+
 }

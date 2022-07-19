@@ -8,6 +8,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static com.vdev.library.rest.TestConstants.CUSTOMER_ANDREW_SMITH_ID;
+import static com.vdev.library.rest.TestConstants.CUSTOMER_LEE_JONES_ID;
 import static com.vdev.library.rest.TestConstants.ID_INVALID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -16,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @Sql(scripts = {"/db/schema.sql", "/db/data.sql"})
-public class CustomerRepositoryTest {
+class CustomerRepositoryTest {
 
     @Autowired
     private CustomerRepository customerRepository;
@@ -43,6 +44,30 @@ public class CustomerRepositoryTest {
     void FindCustomerEntityByName_SmithExists_RecordsReturned() {
         final var customers = customerRepository.findCustomerEntityByName("Smith");
         assertEquals(2, customers.size());
+    }
+
+    @Test
+    void CountByEmail_EmailExists_RecordsFound() {
+        final var customers = customerRepository.countByEmail("andrew.smith@email.com");
+        assertEquals(1, customers);
+    }
+
+    @Test
+    void CountByEmail_EmailDoesNotExist_RecordsFound() {
+        final var customers = customerRepository.countByEmail("blah@email.com");
+        assertEquals(0, customers);
+    }
+
+    @Test
+    void CountByIdNotAndEmail_EmailExistsOnAnother_RecordsFound() {
+        final var customers = customerRepository.countByIdNotAndEmail(CUSTOMER_LEE_JONES_ID, "andrew.smith@email.com");
+        assertEquals(1, customers);
+    }
+
+    @Test
+    void CountByIdNotAndEmail_EmailDoesNotExistOnAnother_RecordsFound() {
+        final var customers = customerRepository.countByIdNotAndEmail(CUSTOMER_ANDREW_SMITH_ID, "andrew.smith@email.com");
+        assertEquals(0, customers);
     }
 
 }
