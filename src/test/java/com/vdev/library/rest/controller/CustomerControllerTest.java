@@ -53,6 +53,8 @@ public class CustomerControllerTest {
                 .extract()
                 .response();
 
+        System.out.println(response.prettyPrint());
+
         response.then()
                 .body("errors", notNullValue())
                 .body("errors.size()", equalTo(0))
@@ -65,7 +67,8 @@ public class CustomerControllerTest {
                 .body("payload.address4", equalTo("Address 4"))
                 .body("payload.postCode", equalTo("PC12 1AC"))
                 .body("payload.telephone", equalTo("020 100 3000"))
-                .body("payload.email", equalTo("lee.jones@email.com"));
+                .body("payload.email", equalTo("lee.jones@email.com"))
+                .body("payload.version", equalTo(1));
 
     }
 
@@ -107,6 +110,7 @@ public class CustomerControllerTest {
                 .body("payload.customers.find{it.id=='" + CUSTOMER_ANDREW_SMITH_ID + "'}.postCode", equalTo("PC12 1AA"))
                 .body("payload.customers.find{it.id=='" + CUSTOMER_ANDREW_SMITH_ID + "'}.telephone", equalTo("020 100 1000"))
                 .body("payload.customers.find{it.id=='" + CUSTOMER_ANDREW_SMITH_ID + "'}.email", equalTo("andrew.smith@email.com"))
+                .body("payload.customers.find{it.id=='" + CUSTOMER_ANDREW_SMITH_ID + "'}.version", equalTo(1))
                 .body("payload.customers.find{it.id=='" + CUSTOMER_LAURA_SMITH_ID + "'}.id", equalTo(CUSTOMER_LAURA_SMITH_ID))
                 .body("payload.customers.find{it.id=='" + CUSTOMER_LAURA_SMITH_ID + "'}.name", equalTo("Laura Smith"))
                 .body("payload.customers.find{it.id=='" + CUSTOMER_LAURA_SMITH_ID + "'}.address1", equalTo("Address 1"))
@@ -115,7 +119,8 @@ public class CustomerControllerTest {
                 .body("payload.customers.find{it.id=='" + CUSTOMER_LAURA_SMITH_ID + "'}.address4", equalTo("Address 4"))
                 .body("payload.customers.find{it.id=='" + CUSTOMER_LAURA_SMITH_ID + "'}.postCode", equalTo("PC12 1AB"))
                 .body("payload.customers.find{it.id=='" + CUSTOMER_LAURA_SMITH_ID + "'}.telephone", equalTo("020 100 2000"))
-                .body("payload.customers.find{it.id=='" + CUSTOMER_LAURA_SMITH_ID + "'}.email", equalTo("laura.smith@email.com"));
+                .body("payload.customers.find{it.id=='" + CUSTOMER_LAURA_SMITH_ID + "'}.email", equalTo("laura.smith@email.com"))
+                .body("payload.customers.find{it.id=='" + CUSTOMER_LAURA_SMITH_ID + "'}.version", equalTo(1));
 
     }
 
@@ -181,7 +186,7 @@ public class CustomerControllerTest {
         response.then()
                 .body("payload", nullValue())
                 .body("errors", notNullValue())
-                .body("errors.size()", equalTo(4))
+                .body("errors.size()", equalTo(5))
                 .body("errors.find{it.errorCode=='B00000002'}.errorCode", equalTo("B00000002"))
                 .body("errors.find{it.errorCode=='B00000002'}.message", equalTo(messageSource.getMessage("B00000002", new String[]{}, Locale.getDefault())))
                 .body("errors.find{it.errorCode=='B00000004'}.errorCode", equalTo("B00000004"))
@@ -189,7 +194,9 @@ public class CustomerControllerTest {
                 .body("errors.find{it.errorCode=='B00000006'}.errorCode", equalTo("B00000006"))
                 .body("errors.find{it.errorCode=='B00000006'}.message", equalTo(messageSource.getMessage("B00000006", new String[]{}, Locale.getDefault())))
                 .body("errors.find{it.errorCode=='B00000010'}.errorCode", equalTo("B00000010"))
-                .body("errors.find{it.errorCode=='B00000010'}.message", equalTo(messageSource.getMessage("B00000010", new String[]{}, Locale.getDefault())));
+                .body("errors.find{it.errorCode=='B00000010'}.message", equalTo(messageSource.getMessage("B00000010", new String[]{}, Locale.getDefault())))
+                .body("errors.find{it.errorCode=='B00000016'}.errorCode", equalTo("B00000016"))
+                .body("errors.find{it.errorCode=='B00000016'}.message", equalTo(messageSource.getMessage("B00000016", new String[]{}, Locale.getDefault())));
 
     }
 
@@ -243,6 +250,7 @@ public class CustomerControllerTest {
                 .postCode("PC12 1AA")
                 .telephone("020 100 1000")
                 .email("andy.smith@email.com")
+                .version(1)
                 .build();
         final var objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
         final var json = objectMapper.writeValueAsString(customer);
@@ -258,8 +266,6 @@ public class CustomerControllerTest {
                 .extract()
                 .response();
 
-        System.out.println(response.prettyPrint());
-
         response.then()
                 .body("errors", notNullValue())
                 .body("errors.size()", equalTo(0))
@@ -272,7 +278,79 @@ public class CustomerControllerTest {
                 .body("payload.address4", equalTo("Address 4"))
                 .body("payload.postCode", equalTo("PC12 1AA"))
                 .body("payload.telephone", equalTo("020 100 1000"))
-                .body("payload.email", equalTo("andy.smith@email.com"));
+                .body("payload.email", equalTo("andy.smith@email.com"))
+                .body("payload.version", equalTo(2));
+
+    }
+
+    @Test
+    void PostCustomerById_EmptyData_BadRequest() throws JsonProcessingException {
+
+        final var customer = Customer.builder().build();
+        final var objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        final var json = objectMapper.writeValueAsString(customer);
+
+        final var response = given()
+                .accept(ContentType.JSON)
+                .contentType(APPLICATION_JSON_VALUE)
+                .body(json)
+                .when()
+                .post(String.format(TEST_URL, port))
+                .then()
+                .statusCode(BAD_REQUEST.value())
+                .extract()
+                .response();
+
+        response.then()
+                .body("payload", nullValue())
+                .body("errors", notNullValue())
+                .body("errors.size()", equalTo(5))
+                .body("errors.find{it.errorCode=='B00000002'}.errorCode", equalTo("B00000002"))
+                .body("errors.find{it.errorCode=='B00000002'}.message", equalTo(messageSource.getMessage("B00000002", new String[]{}, Locale.getDefault())))
+                .body("errors.find{it.errorCode=='B00000004'}.errorCode", equalTo("B00000004"))
+                .body("errors.find{it.errorCode=='B00000004'}.message", equalTo(messageSource.getMessage("B00000004", new String[]{}, Locale.getDefault())))
+                .body("errors.find{it.errorCode=='B00000006'}.errorCode", equalTo("B00000006"))
+                .body("errors.find{it.errorCode=='B00000006'}.message", equalTo(messageSource.getMessage("B00000006", new String[]{}, Locale.getDefault())))
+                .body("errors.find{it.errorCode=='B00000010'}.errorCode", equalTo("B00000010"))
+                .body("errors.find{it.errorCode=='B00000010'}.message", equalTo(messageSource.getMessage("B00000010", new String[]{}, Locale.getDefault())))
+                .body("errors.find{it.errorCode=='B00000016'}.errorCode", equalTo("B00000016"))
+                .body("errors.find{it.errorCode=='B00000016'}.message", equalTo(messageSource.getMessage("B00000016", new String[]{}, Locale.getDefault())));
+
+    }
+
+    @Test
+    void PostCustomerById_DuplicateEmail_BadRequest() throws JsonProcessingException {
+        final var customer = Customer
+                .builder()
+                .name("Andy Smith")
+                .address1("Address 1")
+                .address2("Address 2")
+                .address3("Address 3")
+                .address4("Address 4")
+                .postCode("PC12 5AA")
+                .telephone("020 100 5000")
+                .email("andrew.smith@email.com")
+                .build();
+        final var objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        final var json = objectMapper.writeValueAsString(customer);
+
+        final var response = given()
+                .accept(ContentType.JSON)
+                .contentType(APPLICATION_JSON_VALUE)
+                .body(json)
+                .when()
+                .post(String.format(TEST_URL, port))
+                .then()
+                .statusCode(BAD_REQUEST.value())
+                .extract()
+                .response();
+
+        response.then()
+                .body("payload", nullValue())
+                .body("errors", notNullValue())
+                .body("errors.size()", equalTo(1))
+                .body("errors.find{it.errorCode=='B00000015'}.errorCode", equalTo("B00000015"))
+                .body("errors.find{it.errorCode=='B00000015'}.message", equalTo(messageSource.getMessage("B00000015", new String[]{}, Locale.getDefault())));
 
     }
 

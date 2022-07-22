@@ -54,11 +54,12 @@ class CustomerValidationTest {
                 .build();
 
         final Set<ConstraintViolation<Object>> constraintViolations = validator.validate(customer);
-        assertEquals(4, constraintViolations.size());
+        assertEquals(5, constraintViolations.size());
         assertTrue(errorExists(constraintViolations, "name", "B00000002"));
         assertTrue(errorExists(constraintViolations, "address1", "B00000004"));
         assertTrue(errorExists(constraintViolations, "address2", "B00000006"));
         assertTrue(errorExists(constraintViolations, "postCode", "B00000010"));
+        assertTrue(errorExists(constraintViolations, "email", "B00000016"));
     }
 
     @Test

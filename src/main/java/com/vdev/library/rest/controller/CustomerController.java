@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -77,7 +78,7 @@ public class CustomerController {
     @PutMapping(value = "/{customerId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<RestResponse<Customer>> editCustomerById(
             @PathVariable(name = "customerId") final String customerId,
-            @Parameter(description = "") @Valid @RequestBody final Customer customer,
+            @Parameter(description = "Customer model") @Valid @RequestBody final Customer customer,
             final BindingResult bindingResult,
             final Locale locale) {
 
@@ -93,13 +94,47 @@ public class CustomerController {
                             messageSource.getMessage("B00000015", new String[]{}, locale)));
                     return ResponseEntity.badRequest().body(restResponse);
                 } else {
-                    customerService.saveEdit(customerId, customer);
-                    restResponse.setPayload(customer);
+                    final var savedCustomer = customerService.saveEdit(customerId, customer);
+                    restResponse.setPayload(savedCustomer);
                     return ResponseEntity.ok().body(restResponse);
                 }
             }
         } else {
             throw new NotFoundException();
+        }
+
+    }
+
+    @Operation(summary = "Create new customer by id", description = "Create new customer by id", tags = {"Customer"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Customer updated", content = {
+                    @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = RestResponseCustomer.class))
+            }),
+            @ApiResponse(responseCode = "400", description = "Customer create failed", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Customer not found", content = @Content)
+    })
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<RestResponse<Customer>> newCustomer(
+            @Parameter(description = "Customer model") @Valid @RequestBody final Customer customer,
+            final BindingResult bindingResult,
+            final Locale locale) {
+
+        if (bindingResult.hasErrors()) {
+            throw new BadRequestException(bindingResult);
+        } else {
+            final var restResponse = new RestResponse<Customer>();
+            if (customerService.doesEmailExist(customer.getEmail())) {
+                restResponse.getErrors().add(new Error(
+                        "B00000015",
+                        messageSource.getMessage("B00000015", new String[]{}, locale)));
+                return ResponseEntity.badRequest().body(restResponse);
+            } else {
+                final var savedCustomer = customerService.saveNew(customer);
+                restResponse.setPayload(savedCustomer);
+                return ResponseEntity.ok().body(restResponse);
+            }
         }
 
     }

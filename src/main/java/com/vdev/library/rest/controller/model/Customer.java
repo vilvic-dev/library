@@ -8,6 +8,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 
 @Builder
 @Data
@@ -52,6 +53,17 @@ public class Customer {
     @Schema(description = "Email address", example = "andrew.smith@email.com", required = true)
     @Size(max = 255, message = "B00000013")
     @Email(message = "B00000014")
+    @NotEmpty(message = "B00000016")
     private String email;
+
+    @Schema(description = "Version", example = "1", required = true)
+    private long version;
+
+    @Schema(description = "Created date/time", example = "2022-07-22T12:00:00")
+    private LocalDateTime created;
+
+    @Schema(description = "Updated date/time", example = "2022-07-22T14:00:00")
+    private LocalDateTime updated;
+
 
 }

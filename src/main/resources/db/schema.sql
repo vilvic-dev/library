@@ -32,12 +32,17 @@ CREATE TABLE book
 CREATE TABLE customer
 (
     id        VARCHAR(40) PRIMARY KEY,
-    name      VARCHAR(100) NOT NULL,
-    address1  VARCHAR(100) NOT NULL,
-    address2  VARCHAR(100) NOT NULL,
+    name      VARCHAR(100)           NOT NULL,
+    address1  VARCHAR(100)           NOT NULL,
+    address2  VARCHAR(100)           NOT NULL,
     address3  VARCHAR(100),
     address4  VARCHAR(100),
-    post_code VARCHAR(16)  NOT NULL,
+    post_code VARCHAR(16)            NOT NULL,
     telephone VARCHAR(16),
-    email     VARCHAR(255) NOT NULL
+    email     VARCHAR(255)           NOT NULL,
+    version   INTEGER                NOT NULL,
+    created   DATETIME DEFAULT NOW() NOT NULL,
+    updated   DATETIME               NOT NULL
 );
+
+CREATE UNIQUE INDEX customerEmailAK ON customer (email);
